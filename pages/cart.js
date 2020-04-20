@@ -9,14 +9,17 @@ import TableRow from "@material-ui/core/TableRow";
 import TableHead from "@material-ui/core/TableHead";
 import Checkbox from "@material-ui/core/Checkbox";
 import Button from "@material-ui/core/Button";
+import { updateQty } from "../actions/cart";
 
 const useCart = () => {
+  const dispatch = useDispatch();
+  const updateCartQty = (params) => dispatch(updateQty(params));
   const cart = useSelector((state) => state.cart);
-  return { cart };
+  return { cart, updateCartQty };
 };
 
 const CartPage = () => {
-  const { cart } = useCart();
+  const { cart, updateCartQty } = useCart();
   let total = 0;
   return (
     <Layout>
@@ -27,9 +30,13 @@ const CartPage = () => {
             <TableCell padding="checkbox">
               <Checkbox inputProps={{ "aria-label": "select all desserts" }} />
             </TableCell>
-            <TableCell padding="checkbox">Product</TableCell>
+            <TableCell padding="checkbox" align="center">
+              Product
+            </TableCell>
             <TableCell padding="checkbox">Price</TableCell>
-            <TableCell padding="checkbox">Qty</TableCell>
+            <TableCell padding="checkbox" align="center" size="small">
+              Qty
+            </TableCell>
             <TableCell padding="checkbox">Total</TableCell>
           </TableRow>
         </TableHead>
@@ -55,11 +62,39 @@ const CartPage = () => {
                     inputProps={{ "aria-label": "select all desserts" }}
                   />
                 </TableCell>
-                <TableCell padding="checkbox">{product.product.name}</TableCell>
+                <TableCell padding="checkbox" align="center">
+                  <div className="img-thumbnail">
+                    <img src={product.product.image.url} />
+                  </div>
+                  {product.product.name}
+                </TableCell>
                 <TableCell padding="checkbox">
                   ${product.product.price_range.maximum_price.final_price.value}
                 </TableCell>
-                <TableCell padding="checkbox">{product.qty}</TableCell>
+                <TableCell padding="checkbox" align="center">
+                  <div className="qty">
+                    <Button
+                      color="secondary"
+                      variant="contained"
+                      onClick={() =>
+                        updateCartQty({ type: "min", id: product.product.id })
+                      }
+                      disabled={product.qty === 1}
+                    >
+                      -
+                    </Button>
+                    <div className="qty-detail">{product.qty}</div>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      onClick={() =>
+                        updateCartQty({ type: "plus", id: product.product.id })
+                      }
+                    >
+                      +
+                    </Button>
+                  </div>
+                </TableCell>
                 <TableCell padding="checkbox">
                   $
                   {product.product.price_range.maximum_price.final_price.value *
@@ -91,6 +126,27 @@ const CartPage = () => {
             padding: 10px;
             display: flex;
             justify-content: center;
+          }
+          .img-thumbnail {
+            margin: 0 auto;
+            width 100px;
+            height: 100px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+          }
+          .img-thumbnail img {
+            height: 100%;
+            width: auto;
+          }
+          .qty {
+            display: flex;
+            margin: 0 auto;
+            justify-content: center;
+            align-items: center;
+          }
+          .qty-detail {
+            padding: 0 20px;
           }
         `}
       </style>
